@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      FRED_API_KEY: dummy
+      ALPHA_VANTAGE_API_KEY: dummy
+      PG_HOST: localhost
+      PG_PORT: 5432
+      PG_DB: db
+      PG_USER: user
+      PG_PASSWORD: password
+      DATABASE_URL: postgresql://user:password@localhost:5432/db
+      AWS_ACCESS_KEY: dummy
+      AWS_SECRET_ACCESS_KEY: dummy
+      S3_BUCKET: dummy
+      DJANGO_SECRET_KEY: dummy
+      DEBUG: "False"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install -e ".[dev]"
+
+      - name: Run tests
+        run: |
+          pytest tests/ -v --tb=short
