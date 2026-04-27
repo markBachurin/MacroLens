@@ -1,0 +1,86 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Macro Factors{% endblock %}
+{% block nav_factors %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <div class="breadcrumb">MacroLens › Macro Factors</div>
+    <h1>Macro Factor Charts</h1>
+    <p>Real vs nominal oil prices · yield curve spread · recession signals</p>
+  </div>
+  <div class="page-header-right" id="last-updated">—</div>
+</div>
+
+<!-- Row 1: Real vs Nominal Oil -->
+<div class="card mb-20">
+  <div class="card-header">
+    <div>
+      <div class="card-title">WTI Oil — Nominal vs Real (Inflation-Adjusted)</div>
+      <div class="card-sub">
+        Real WTI deflated by CPI · gap shows inflation effect ·
+        2008 peak looks higher in real terms than 2022 — counterintuitive
+      </div>
+    </div>
+    <div class="window-selector">
+      <button class="window-btn" onclick="setOilWindow(252, this)">1Y</button>
+      <button class="window-btn" onclick="setOilWindow(1260, this)">5Y</button>
+      <button class="window-btn" onclick="setOilWindow(2520, this)">10Y</button>
+      <button class="window-btn active" onclick="setOilWindow(99999, this)">MAX</button>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="chart-wrap" style="height:500px">
+      <canvas id="oilChart"></canvas>
+    </div>
+    <div class="insight-box" id="oil-insight"></div>
+  </div>
+</div>
+
+<!-- Row 2: Yield Curve Spread -->
+<div class="card mb-20">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Yield Curve Spread (10Y − 2Y)</div>
+      <div class="card-sub">
+        Red shading = inversion · inversions preceded every recession ·
+        2006–07, 2019, 2022 · S&P 500 overlay shows lag to market decline
+      </div>
+    </div>
+    <div style="display:flex; gap:12px; align-items:center">
+      <div style="display:flex; gap:16px; font-size:12px; color:var(--text-secondary)">
+        <span style="display:flex; align-items:center; gap:5px">
+          <span style="width:12px;height:3px;background:#0073BB;display:inline-block;border-radius:2px"></span>
+          Yield Spread
+        </span>
+        <span style="display:flex; align-items:center; gap:5px">
+          <span style="width:12px;height:3px;background:#1D8348;display:inline-block;border-radius:2px"></span>
+          S&P 500 (right axis)
+        </span>
+        <span style="display:flex; align-items:center; gap:5px">
+          <span style="width:12px;height:6px;background:rgba(192,57,43,0.2);display:inline-block;border-radius:2px"></span>
+          Inversion
+        </span>
+      </div>
+      <div class="window-selector">
+        <button class="window-btn" onclick="setYieldWindow(252, this)">1Y</button>
+        <button class="window-btn" onclick="setYieldWindow(1260, this)">5Y</button>
+        <button class="window-btn" onclick="setYieldWindow(2520, this)">10Y</button>
+        <button class="window-btn active" onclick="setYieldWindow(99999, this)">MAX</button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="chart-wrap" style="height:500px">
+      <canvas id="yieldChart"></canvas>
+    </div>
+    <div class="insight-box" id="yield-insight"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{% static 'js/pages/macro.js' %}"></script>
+{% endblock %}

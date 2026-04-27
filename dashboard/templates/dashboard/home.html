@@ -1,0 +1,106 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Home — Current Regime{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <div class="breadcrumb">MacroLens</div>
+    <h1>Current Regime</h1>
+    <p>Live snapshot — all series, latest values, anomaly flags</p>
+  </div>
+  <div class="page-header-right" id="last-updated">—</div>
+</div>
+
+<!-- Stat Cards -->
+<div class="grid-6 mb-20" id="stat-row">
+  <div class="stat-card skeleton" style="height:88px"></div>
+  <div class="stat-card skeleton" style="height:88px"></div>
+  <div class="stat-card skeleton" style="height:88px"></div>
+  <div class="stat-card skeleton" style="height:88px"></div>
+  <div class="stat-card skeleton" style="height:88px"></div>
+  <div class="stat-card skeleton" style="height:88px"></div>
+</div>
+
+<!-- Row 1: Anomaly mini timeline + Active anomalies -->
+<div class="grid-8-4">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Anomaly Cluster Timeline</div>
+        <div class="card-sub">Z-score across key series · ±2.5σ threshold</div>
+      </div>
+      <div class="window-selector">
+        <button class="window-btn" onclick="setWindow(252, this)">1Y</button>
+        <button class="window-btn active" onclick="setWindow(1260, this)">5Y</button>
+        <button class="window-btn" onclick="setWindow(99999, this)">MAX</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="chart-wrap" style="height:500px">
+        <canvas id="anomalyChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Active Anomalies</div>
+      <div class="card-sub">Series outside ±2.5σ today</div>
+    </div>
+    <div class="card-body-flush">
+      <div id="anomaly-mini" style="max-height:340px; overflow-y:auto; padding:0"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Row 2: Mini heatmap + Yield curve mini + Regression betas -->
+<div class="grid-3">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Correlation Snapshot</div>
+      <div class="card-sub">90-day Pearson r — latest</div>
+    </div>
+    <div class="card-body" style="padding:12px">
+      <div id="mini-heatmap"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Yield Curve Spread</div>
+      <div class="card-sub">10Y − 2Y · inversion = recession signal</div>
+    </div>
+    <div class="card-body">
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="yieldMiniChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Regression Betas — Latest</div>
+      <div class="card-sub" id="beta-date">OLS: SP500 ~ WTI + FedFunds + 10Y</div>
+    </div>
+    <div class="card-body" style="padding:0">
+      <div id="beta-summary"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Row 3: Z-score gauges for all series -->
+<div class="card mb-20">
+  <div class="card-header">
+    <div class="card-title">Z-Score Gauges — All Series</div>
+    <div class="card-sub">Distance from 252-day rolling mean · threshold ±2.5σ</div>
+  </div>
+  <div class="card-body" id="gauge-panel"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{% static 'js/pages/home.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Anomalies{% endblock %}
+{% block nav_anomalies %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <div class="breadcrumb">MacroLens › Monitoring</div>
+    <h1>Anomaly Monitor</h1>
+    <p>Z-score extremes across all series · ±2.5σ threshold · 252-day rolling mean</p>
+  </div>
+  <div class="page-header-right" id="last-updated">—</div>
+</div>
+
+<!-- Row 1: Anomaly cluster timeline (full) -->
+<div class="card mb-20">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Anomaly Cluster Timeline</div>
+      <div class="card-sub">Select series to overlay · clusters at 2008, 2020 COVID, 2022 Ukraine war</div>
+    </div>
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+      <!-- Series toggles -->
+      <div id="series-toggles" style="display:flex; gap:6px; flex-wrap:wrap"></div>
+      <!-- Window selector -->
+      <div class="window-selector">
+        <button class="window-btn" onclick="setTimelineWindow(252, this)">1Y</button>
+        <button class="window-btn" onclick="setTimelineWindow(504, this)">2Y</button>
+        <button class="window-btn active" onclick="setTimelineWindow(1260, this)">5Y</button>
+        <button class="window-btn" onclick="setTimelineWindow(2520, this)">10Y</button>
+        <button class="window-btn" onclick="setTimelineWindow(99999, this)">MAX</button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="chart-wrap" style="height:500px">
+      <canvas id="anomalyTimelineChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Row 2: Current anomalies table + Z-score gauges -->
+<div class="grid-8-4">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Current Anomalies</div>
+      <div class="card-sub">Series flagged outside ±2.5σ — latest snapshot per series</div>
+    </div>
+    <div class="card-body-flush">
+      <table class="data-table" id="anomaly-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Series</th>
+            <th>Value</th>
+            <th>Z-Score</th>
+            <th>Direction</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="anomaly-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Z-Score Gauges</div>
+      <div class="card-sub">All series · ordered by |z| · threshold ±2.5σ</div>
+    </div>
+    <div class="card-body" id="gauge-panel" style="padding:12px 16px; max-height:440px; overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- Row 3: Fear & Greed Index -->
+<div class="card mb-20" style="margin-top:20px">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Fear & Greed Index</div>
+      <div class="card-sub">Mean |z-score| of VIX · WTI · Gold · high value = market stress</div>
+    </div>
+    <div style="display:flex; gap:16px; align-items:center">
+      <div id="stress-current" style="font-family:var(--mono); font-size:20px; font-weight:500; color:var(--text-primary)">—</div>
+      <div class="window-selector">
+        <button class="window-btn" onclick="setStressWindow(252, this)">1Y</button>
+        <button class="window-btn active" onclick="setStressWindow(1260, this)">5Y</button>
+        <button class="window-btn" onclick="setStressWindow(99999, this)">MAX</button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="chart-wrap" style="height:500px">
+      <canvas id="stressChart"></canvas>
+    </div>
+    <div class="insight-box" id="stress-insight"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{% static 'js/pages/anomalies.js' %}"></script>
+{% endblock %}

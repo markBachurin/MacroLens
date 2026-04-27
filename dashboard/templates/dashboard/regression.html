@@ -1,0 +1,74 @@
+<script src="../../static/js/pages/lags.js"></script>{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Regression{% endblock %}
+{% block nav_regression %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <div class="breadcrumb">MacroLens › Analytics</div>
+    <h1>OLS Regression Analysis</h1>
+    <p>Rolling 252-day OLS · S&P 500 returns ~ WTI + Fed Funds + 10Y Yield</p>
+  </div>
+  <div class="page-header-right" id="last-updated">—</div>
+</div>
+
+<!-- Row 1: Latest coefficients + R² -->
+<div class="grid-5-7">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Latest Coefficients</div>
+      <div class="card-sub" id="reg-date">—</div>
+    </div>
+    <div class="card-body-flush">
+      <table class="data-table" id="reg-table">
+        <thead>
+          <tr>
+            <th>Variable</th>
+            <th>Beta</th>
+            <th>P-Value</th>
+            <th>Sig</th>
+            <th>VIF</th>
+          </tr>
+        </thead>
+        <tbody id="reg-tbody"></tbody>
+      </table>
+      <div style="padding:16px 20px; border-top:1px solid var(--border)">
+        <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px">Model R²</div>
+        <div class="mono" style="font-size:32px; font-weight:500" id="r2-display">—</div>
+        <div class="insight-box" id="r2-insight" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Beta Evolution — All Variables</div>
+      <div class="card-sub">Rolling 252-day OLS coefficients over time</div>
+    </div>
+    <div class="card-body">
+      <div class="chart-wrap" style="height:500px">
+        <canvas id="betaChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Row 2: R² evolution -->
+<div class="card mb-20" style="margin-top:20px">
+  <div class="card-header">
+    <div class="card-title">R² Evolution</div>
+    <div class="card-sub">Model explanatory power over time · how much of SP500 returns are explained by these 3 factors</div>
+  </div>
+  <div class="card-body">
+    <div class="chart-wrap" style="height:500px">
+      <canvas id="r2Chart"></canvas>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{% static 'js/pages/regression.js' %}"></script>
+{% endblock %}

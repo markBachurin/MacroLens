@@ -1,0 +1,128 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user", "-d", "db"]
+      interval: 5s
+      retries: 5
+
+  airflow-init:
+    build: temp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://user:password@postgres:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    entrypoint: >
+      /bin/bash -c "
+        airflow db migrate && airflow users create --username admin --password admin --firstname Admin --lastname Admin --role Admin --email admin@gmail.com \
+      "
+
+  airflow-webserver:
+    build: temp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://user:password@postgres:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__WEBSERVER__SECRET_KEY: "macrolens-secret-key-123"
+      PYTHONDONTWRITEBYTECODE: "1"
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DB: db
+      PG_USER: user
+      PG_PASSWORD: password
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./ingestion:/opt/airflow/ingestion
+      - ./transformation:/opt/airflow/transformation
+      - ./.env:/opt/airflow/.env
+      - ./analytics:/opt/airflow/analytics
+    ports:
+      - "8080:8080"
+    command: webserver
+
+  airflow-scheduler:
+    build: temp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://user:password@postgres:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__WEBSERVER__SECRET_KEY: "macrolens-secret-key-123"
+      PYTHONDONTWRITEBYTECODE: "1"
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DB: db
+      PG_USER: user
+      PG_PASSWORD: password
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./ingestion:/opt/airflow/ingestion
+      - ./transformation:/opt/airflow/transformation
+      - ./.env:/opt/airflow/.env
+      - ./analytics:/opt/airflow/analytics
+    command: scheduler
+
+  db-init:
+    build: temp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DB: db
+      PG_USER: user
+      PG_PASSWORD: password
+    volumes:
+      - ./scripts:/opt/airflow/scripts
+      - ./ingestion:/opt/airflow/ingestion
+      - ./.env:/opt/airflow/.env
+    working_dir: /opt/airflow
+    command: python scripts/init_db.py
+    restart: "no"
+
+  api:
+    build:
+      context: temp
+      dockerfile: Dockerfile.api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DB: db
+      PG_USER: user
+      PG_PASSWORD: password
+      DJANGO_SECRET_KEY: "macrolens-secret-key-123"
+      DEBUG: "True"
+    volumes:
+      - ./api:/opt/api
+      - ./dashboard:/opt/api/dashboard
+      - ./ingestion:/opt/ingestion
+      - ./transformation:/opt/transformation
+      - ./analytics:/opt/analytics
+      - ./.env:/opt/api/.env
+    ports:
+      - "8000:8000"
+    working_dir: /opt/api/api
+    command: python manage.py runserver 0.0.0.0:8000
+
+volumes:
+  postgres_data:

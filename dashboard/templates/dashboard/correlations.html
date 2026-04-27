@@ -1,0 +1,73 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Correlations{% endblock %}
+{% block nav_correlations %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <div class="breadcrumb">MacroLens › Analytics</div>
+    <h1>Rolling Correlation Matrix</h1>
+    <p>Pearson r on daily % changes · 9 macro pairs · 3 rolling windows</p>
+  </div>
+  <div class="page-header-right" id="last-updated">—</div>
+</div>
+
+<!-- Row 1: Full 9x3 heatmap -->
+<div class="card mb-20">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Correlation Regime Heatmap</div>
+      <div class="card-sub">9 pairs × 3 windows · blue = negative · red = positive · click a cell to inspect</div>
+    </div>
+    <div class="window-selector">
+      <button class="window-btn active" onclick="setHeatmapWindow(30, this)">30D</button>
+      <button class="window-btn" onclick="setHeatmapWindow(90, this)">90D</button>
+      <button class="window-btn" onclick="setHeatmapWindow(252, this)">252D</button>
+    </div>
+  </div>
+  <div class="card-body" style="padding:16px; overflow-x:auto">
+    <div id="full-heatmap"></div>
+  </div>
+</div>
+
+<!-- Row 2: Rolling correlation time series + pair detail -->
+<div class="grid-7-5">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title" id="corr-ts-title">Rolling Correlation</div>
+        <div class="card-sub">Select a pair and window · green = positive regime · red = negative</div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center">
+        <select id="pair-select" onchange="onPairChange()"></select>
+        <div class="window-selector">
+          <button class="window-btn active" onclick="setCorrTsWindow(30, this)">30D</button>
+          <button class="window-btn" onclick="setCorrTsWindow(90, this)">90D</button>
+          <button class="window-btn" onclick="setCorrTsWindow(252, this)">252D</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="chart-wrap" style="height:500px">
+        <canvas id="corrTsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title" id="pair-detail-title">Select a pair</div>
+      <div class="card-sub">Click a heatmap cell or use the dropdown</div>
+    </div>
+    <div class="card-body" id="pair-detail-body" style="color:var(--text-muted); font-size:13px">
+      Click any cell in the heatmap or select a pair from the dropdown to see correlation details across all three windows.
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{% static 'js/pages/correlations.js' %}"></script>
+{% endblock %}

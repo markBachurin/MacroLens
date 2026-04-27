@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "macrolens"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "requests",
+    "yfinance",
+    "psycopg2-binary",
+    "boto3",
+    "python-dotenv",
+    "pandas",
+    "scipy",
+    "statsmodels",
+    "django>=5.0",
+    "djangorestframework",
+    "django-cors-headers",
+]
+
+[project.optional-dependencies]
+airflow = [
+    "apache-airflow==2.9.0",
+]
+dev = [
+    "pytest",
+    "pytest-django",
+    "responses",
+    "ruff",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ingestion*", "transformation*", "analytics*", "api*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

@@ -1,0 +1,71 @@
+<script src="../../static/js/chartUtils.js"></script>{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Lag Analysis{% endblock %}
+{% block nav_lags %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header-left">
+    <div class="breadcrumb">MacroLens › Analytics</div>
+    <h1>Lead / Lag Analysis</h1>
+    <p>Does series A move before series B? Cross-correlation at lags 1, 5, 10, 20, 60 days</p>
+  </div>
+  <div class="page-header-right" id="last-updated">—</div>
+</div>
+
+<!-- Row 1: Lag bar chart + interpretation -->
+<div class="grid-7-5">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title" id="lag-chart-title">Lag Correlation</div>
+        <div class="card-sub">Bar opacity = statistical significance · faded = p &gt; 0.05</div>
+      </div>
+      <select id="pair-select" onchange="onPairChange()"></select>
+    </div>
+    <div class="card-body">
+      <div class="chart-wrap" style="height:500px">
+        <canvas id="lagChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Interpretation</div>
+      <div class="card-sub">Lead-lag relationship analysis</div>
+    </div>
+    <div class="card-body" id="lag-interpretation" style="font-size:13px; color:var(--text-secondary); line-height:1.8">
+      Select a pair to see the lead-lag interpretation.
+    </div>
+  </div>
+</div>
+
+<!-- Row 2: Full lag results table -->
+<div class="card" style="margin-top:20px">
+  <div class="card-header">
+    <div class="card-title">All Lag Results</div>
+    <div class="card-sub">All computed pairs · sorted by absolute Pearson r</div>
+  </div>
+  <div class="card-body-flush" style="overflow-x:auto">
+    <table class="data-table" id="lag-table">
+      <thead>
+        <tr>
+          <th>Series A</th>
+          <th>Series B</th>
+          <th>Lag (days)</th>
+          <th>Pearson r</th>
+          <th>P-Value</th>
+          <th>Sig</th>
+        </tr>
+      </thead>
+      <tbody id="lag-tbody"></tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{% static 'js/pages/lags.js' %}"></script>
+{% endblock %}

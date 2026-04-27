@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MacroLens — {% block title %}Dashboard{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/dashboard/">
+    <span>◈</span> MacroLens
+  </a>
+  <div class="nav-links">
+    <a class="nav-link {% block nav_home %}{% endblock %}"           href="/dashboard/">Home</a>
+    <a class="nav-link {% block nav_anomalies %}{% endblock %}"      href="/dashboard/anomalies/">Anomalies</a>
+    <a class="nav-link {% block nav_correlations %}{% endblock %}"   href="/dashboard/correlations/">Correlations</a>
+    <a class="nav-link {% block nav_factors %}{% endblock %}"        href="/dashboard/factors/">Macro Factors</a>
+    <a class="nav-link {% block nav_regression %}{% endblock %}"     href="/dashboard/regression/">Regression</a>
+    <a class="nav-link {% block nav_lags %}{% endblock %}"           href="/dashboard/lags/">Lag Analysis</a>
+    <a class="nav-link {% block nav_stress %}{% endblock %}"         href="/dashboard/stress/">Fear & Greed</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-clock" id="clock">--:-- UTC</div>
+    <div class="live-badge">
+      <span class="live-dot"></span>Live
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+  {% block content %}{% endblock %}
+</div>
+
+<!-- Chart.js + zoom/pan plugins -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
+<script type="module">
+  import { startClock } from "{% static 'js/chartUtils.js' %}";
+  startClock('clock');
+</script>
+
+{% block scripts %}{% endblock %}
+
+</body>
+</html>
