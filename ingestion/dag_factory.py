@@ -25,11 +25,11 @@ def create_extract_task(source: str, adapter_class: Type[BaseAdapter]):
 
 def create_archive_task(source: str):
     def archive_raw(**context) -> None:
-        from ingestion.loaders.aws_s3_gate import S3_StorageGate
+        from ingestion.loaders.aws_s3_gate import S3_Client
         from ingestion.config.series_config import get_source_series
 
         raw_payload = context["ti"].xcom_pull(task_ids=f"extract_{source}", key="raw_payload")
-        s3_gate = S3_StorageGate()
+        s3_gate = S3_Client()
         for series_key, records in raw_payload.items():
             series_id = get_source_series(source)[series_key]["series_id"]
             s3_gate.upload_series(records, source, series_id, "raw")
@@ -53,10 +53,10 @@ def create_validate_task(source: str):
 
 def create_load_task(source: str):
     def load_records(**context):
-        from ingestion.loaders.postgres_gate import Postgres_StorageGate
+        from ingestion.loaders.postgres_gate import Postgres_Client
 
         valid_records = context["ti"].xcom_pull(task_ids=f"validate_{source}", key="validated_records")
-        postgres_gate = Postgres_StorageGate()
+        postgres_gate = Postgres_Client()
         try:
             for series_key, records in valid_records.items():
                 postgres_gate.upload_series(records, source, series_key, "raw")

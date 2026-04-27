@@ -1,8 +1,8 @@
-from ingestion.loaders.postgres_gate import Postgres_StorageGate
+from ingestion.loaders.postgres_gate import Postgres_Client
 from ingestion.config.series_config import SERIES_CONFIG
 
 def build_snapshots() -> None:
-    gate = Postgres_StorageGate()
+    gate = Postgres_Client()
 
     for series_key, data in SERIES_CONFIG.items():
         rows = gate.query_normalized_by_series_id(SERIES_CONFIG[series_key]["series_id"])

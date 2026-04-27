@@ -1,4 +1,4 @@
-from ingestion.loaders.postgres_gate import Postgres_StorageGate
+from ingestion.loaders.postgres_gate import Postgres_Client
 import pandas as pd
 from scipy.stats import pearsonr,ConstantInputWarning
 import warnings
@@ -20,7 +20,7 @@ CORRELATION_PAIRS = [
 WINDOWS = [30, 90, 252]
 
 def compute_correlations() -> None:
-    gate = Postgres_StorageGate()
+    gate = Postgres_Client()
 
     series_ids=set()
     for a,b in CORRELATION_PAIRS:

@@ -1,6 +1,6 @@
 import pandas as pd
 from scipy.stats import pearsonr
-from ingestion.loaders.postgres_gate import Postgres_StorageGate
+from ingestion.loaders.postgres_gate import Postgres_Client
 from analytics.correlations import to_pct_change_series
 
 LAG_PAIRS = [
@@ -16,7 +16,7 @@ LAG_PAIRS = [
 LAGS = [1,5,10,20,60]
 
 def compute_lag_analysis() -> None:
-    gate = Postgres_StorageGate()
+    gate = Postgres_Client()
 
     series_ids = set()
     for a, b in LAG_PAIRS:

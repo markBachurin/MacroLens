@@ -1,13 +1,13 @@
 import pandas as pd
 from ingestion.config.series_config import SERIES_CONFIG
-from ingestion.loaders.postgres_gate import Postgres_StorageGate
+from ingestion.loaders.postgres_gate import Postgres_Client
 
 
 def normalize():
-    gate = Postgres_StorageGate()
+    postgres_client = Postgres_Client()
 
     for series_key, data in SERIES_CONFIG.items():
-        rows = gate.query_raw_by_series_key(series_key)
+        rows = postgres_client.query_raw_by_series_key(series_key)
 
         if not rows:
             continue
@@ -23,9 +23,9 @@ def normalize():
 
         records = prepare(s, pct_change, zscore, is_forward_filled_mask)
 
-        gate.upload_normalized_series(records, series_key)
+        postgres_client.upload_normalized_series(records, series_key)
 
-    gate.close()
+    postgres_client.close()
 
 def prepare(s: pd.Series, pct_change: pd.Series, zscore: pd.Series, is_forward_filled: pd.Series) -> list[dict]:
     return [

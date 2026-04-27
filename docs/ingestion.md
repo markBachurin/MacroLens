@@ -24,7 +24,7 @@ ingestion/
 ├── config/
 │   └── series_config.py    ← Single source of truth for all series metadata
 ├── loaders/
-│   ├── base.py             ← Abstract StorageGate base class
+│   ├── base.py             ← Abstract Client base class
 │   ├── db_connection.py    ← psycopg2 connection factory
 │   ├── postgres_gate.py    ← All Postgres read/write operations
 │   ├── aws_s3_gate.py      ← S3 upload implementation
@@ -33,7 +33,7 @@ ingestion/
 │   └── series_validator.py ← Validation rules, pure functions
 └── dag_factory.py          ← Reusable DAG task factory for all ingestion DAGs
 ```
-
+[base.py](../ingestion/loaders/base.py)
 ---
 
 ## Component: `series_config.py`
@@ -187,7 +187,7 @@ load_{source}      → xcom_pull("validated_records") → writes to raw_series t
 
 ---
 
-## Component: StorageGate (`loaders/`)
+## Component: Client (`loaders/`)
 
 ### `aws_s3_gate.py` — S3 Upload
 
@@ -278,13 +278,13 @@ FRED API
 FredAdapter.fetch()
     │  returns list[dict]
     ▼
-S3_StorageGate.upload_series()
+S3_Client.upload_series()
     │  raw_payload/fred/{series_id}/{YYYYMMDD_HHMMSS_ffffff}.json
     ▼
 validate(records, series_key)
     │  returns (valid_records, errors)
     ▼
-Postgres_StorageGate.upload_series()
+Postgres_Client.upload_series()
     │  INSERT INTO raw_series ON CONFLICT DO UPDATE
     ▼
 raw_series table

@@ -4,19 +4,19 @@ import pandas as pd
 
 import statsmodels.api as sm
 from statsmodels.stats.outliers_influence import variance_inflation_factor
-from ingestion.loaders.postgres_gate import Postgres_StorageGate
+from ingestion.loaders.postgres_gate import Postgres_Client
 from analytics.correlations import to_pct_change_series
 
 
 WINDOW = 252
 
 def compute_regression() -> None:
-    gate = Postgres_StorageGate()
+    postgres_client = Postgres_Client()
 
-    sp500 = to_pct_change_series(gate.query_normalized_by_series_id("^GSPC"))
-    wti = to_pct_change_series(gate.query_normalized_by_series_id("DCOILWTICO"))
-    fed = to_pct_change_series(gate.query_normalized_by_series_id("FEDFUNDS"))
-    t10y = to_pct_change_series(gate.query_normalized_by_series_id("DGS10"))
+    sp500 = to_pct_change_series(postgres_client.query_normalized_by_series_id("^GSPC"))
+    wti = to_pct_change_series(postgres_client.query_normalized_by_series_id("DCOILWTICO"))
+    fed = to_pct_change_series(postgres_client.query_normalized_by_series_id("FEDFUNDS"))
+    t10y = to_pct_change_series(postgres_client.query_normalized_by_series_id("DGS10"))
 
     df =  pd.DataFrame({
         "sp500": sp500,
@@ -33,8 +33,8 @@ def compute_regression() -> None:
         if record:
             records.append(record)
 
-    gate.upload_regression_results(records)
-    gate.close()
+    postgres_client.upload_regression_results(records)
+    postgres_client.close()
 
 def run_ols(window_df: pd.DataFrame, date) -> dict | None:
     y = window_df["sp500"]

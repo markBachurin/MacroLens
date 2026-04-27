@@ -1,27 +1,27 @@
 import pandas as pd
-from ingestion.loaders.postgres_gate import Postgres_StorageGate
+from ingestion.loaders.postgres_gate import Postgres_Client
 from transformation.normalizer import compute_pct_change, compute_252d_zscore
 
 def compute_derived() -> None:
-    gate = Postgres_StorageGate()
+    postgres_client = Postgres_Client()
 
-    t10y, t2y, wti, cpi, sp500 = get_series(gate)
+    t10y, t2y, wti, cpi, sp500 = get_series(postgres_client)
 
     df = to_df(t10y, t2y, wti, cpi, sp500)
 
     df = get_derived_metrics(df)
 
-    upload_df(df, gate)
+    upload_df(df, postgres_client)
 
-    gate.close()
+    postgres_client.close()
 
 
-def get_series(gate: Postgres_StorageGate):
-    t10y = to_series(gate.query_normalized_by_series_id("DGS10"))
-    t2y = to_series(gate.query_normalized_by_series_id("BC_2YEAR"))
-    wti = to_series(gate.query_normalized_by_series_id("DCOILWTICO"))
-    cpi = to_series(gate.query_normalized_by_series_id("CPIAUCSL"))
-    sp500 = to_series(gate.query_normalized_by_series_id("^GSPC"))
+def get_series(postgres_client: Postgres_Client):
+    t10y = to_series(postgres_client.query_normalized_by_series_id("DGS10"))
+    t2y = to_series(postgres_client.query_normalized_by_series_id("BC_2YEAR"))
+    wti = to_series(postgres_client.query_normalized_by_series_id("DCOILWTICO"))
+    cpi = to_series(postgres_client.query_normalized_by_series_id("CPIAUCSL"))
+    sp500 = to_series(postgres_client.query_normalized_by_series_id("^GSPC"))
     return t10y, t2y, wti, cpi, sp500
 
 def to_series(rows: list) -> pd.Series:
@@ -53,7 +53,7 @@ def get_derived_metrics(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-def upload_df(df: pd.DataFrame, gate: Postgres_StorageGate) -> None:
+def upload_df(df: pd.DataFrame, postgres_client: Postgres_Client) -> None:
     import math
     for series_key, new_column in [
         ("YIELD_SPREAD", "yield_spread"),
@@ -76,4 +76,4 @@ def upload_df(df: pd.DataFrame, gate: Postgres_StorageGate) -> None:
             if pd.notna(value)
         ]
 
-        gate.upload_normalized_series(records, series_key)
+        postgres_client.upload_normalized_series(records, series_key)
