@@ -11,11 +11,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-import os
-from dotenv import load_dotenv
+from settings import settings
 
 import sys
-load_dotenv()
+
 
 sys.path.insert(0, '/opt')
 sys.path.insert(0, '/opt/api')
@@ -28,9 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-sec-key")
+SECRET_KEY = settings.django_secret_key
 
-DEBUG = os.getenv("DEBUG", "True") == "True"
+DEBUG = settings.debug
 
 ALLOWED_HOSTS = ["*"]
 
@@ -58,11 +57,11 @@ ROOT_URLCONF = 'api.urls'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("PG_DB", "db"),
-        "USER": os.getenv("PG_USER", "user"),
-        "PASSWORD": os.getenv("PG_PASSWORD", "password"),
-        "HOST": os.getenv("PG_HOST", "localhost"),
-        "PORT": os.getenv("PG_PORT", "5432"),
+        "NAME": settings.pg_db,
+        "USER": settings.pg_user,
+        "PASSWORD": settings.pg_password,
+        "HOST": settings.pg_host,
+        "PORT": settings.pg_port,
     }
 }
 

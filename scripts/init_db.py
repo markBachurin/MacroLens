@@ -1,13 +1,5 @@
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from dotenv import load_dotenv
-
-load_dotenv()
-
 from ingestion.loaders.db_connection import get_connection
+from settings import settings
 
 
 def init_db():

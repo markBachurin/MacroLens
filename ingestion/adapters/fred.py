@@ -1,12 +1,12 @@
-import os
 import requests
 from ingestion.adapters.base import BaseAdapter
+from config.settings import settings
 
 class FredAdapter(BaseAdapter):
     BASE_URL =  "https://api.stlouisfed.org/fred/series/observations"
 
     def __init__(self):
-        self.FRED_API_KEY = os.getenv("FRED_API_KEY")
+        self.FRED_API_KEY =  settings.fred_api_key
         if not self.FRED_API_KEY:
             raise ValueError("FRED_API_KEY environment variable is not set")
 

@@ -1,13 +1,13 @@
-import os
 import requests
 from ingestion.adapters.base import BaseAdapter
 from datetime import date
+from config.settings import settings
 
 class AlphaVantageAdapter(BaseAdapter):
     BASE_URL = "https://www.alphavantage.co/query"
 
     def __init__(self):
-        self.api_key = os.getenv("ALPHA_VANTAGE_API_KEY")
+        self.api_key = settings.alpha_vantage_api_key
         if not self.api_key:
             raise ValueError("ALPHA_VANTAGE_API_KEY env var is not set")
 

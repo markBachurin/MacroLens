@@ -1,11 +1,11 @@
-import os
 import psycopg2
+from config.settings import settings
 
 def get_connection():
     return psycopg2.connect(
-            host=os.getenv("PG_HOST", "postgres"),
-            port=os.getenv("PG_PORT"),
-            database=os.getenv("PG_DB"),
-            user=os.getenv("PG_USER"),
-            password=os.getenv("PG_PASSWORD")
+            host=settings.pg_host,
+            port=settings.pg_port,
+            database=settings.pg_db,
+            user=settings.pg_user,
+            password=settings.pg_password
         )

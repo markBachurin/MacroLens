@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 
-class StorageGate(ABC):
+class Client(ABC):
     @property
     @abstractmethod
     def platform(self) -> str:

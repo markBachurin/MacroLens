@@ -2,9 +2,6 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
 
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
 def run_correlations():
     from analytics.correlations import compute_correlations

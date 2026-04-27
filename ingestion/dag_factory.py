@@ -8,8 +8,6 @@ from ingestion.adapters.base import BaseAdapter
 
 def create_extract_task(source: str, adapter_class: Type[BaseAdapter]):
     def extract(**context) -> None:
-        from dotenv import load_dotenv
-        load_dotenv(dotenv_path="/opt/airflow/.env")
         from ingestion.config.series_config import get_source_series
 
         payload = {}
@@ -27,8 +25,6 @@ def create_extract_task(source: str, adapter_class: Type[BaseAdapter]):
 
 def create_archive_task(source: str):
     def archive_raw(**context) -> None:
-        from dotenv import load_dotenv
-        load_dotenv(dotenv_path="/opt/airflow/.env")
         from ingestion.loaders.aws_s3_gate import S3_StorageGate
         from ingestion.config.series_config import get_source_series
 
@@ -57,8 +53,6 @@ def create_validate_task(source: str):
 
 def create_load_task(source: str):
     def load_records(**context):
-        from dotenv import load_dotenv
-        load_dotenv(dotenv_path="/opt/airflow/.env")
         from ingestion.loaders.postgres_gate import Postgres_StorageGate
 
         valid_records = context["ti"].xcom_pull(task_ids=f"validate_{source}", key="validated_records")

@@ -1,8 +1,4 @@
 import sys
-from pathlib import Path
-from dotenv import load_dotenv
-sys.path.insert(0, str(Path(__file__).parent.parent))
-load_dotenv()
 
 if len(sys.argv) < 2:
     print("Usage: python dir/test_loader.py <source_name>")
@@ -10,9 +6,8 @@ if len(sys.argv) < 2:
 
 
 from ingestion.config.series_config import get_source_series
-from ingestion.loaders.postgres_gate import Postgres_StorageGate
-from ingestion.loaders.aws_s3_gate import S3_StorageGate
-from datetime import date
+from ingestion.loaders.postgres_gate import Postgres_Client
+from ingestion.loaders.aws_s3_gate import S3_Client
 
 
 from ingestion.validators.series_validator import validate, print_errors
@@ -25,6 +20,12 @@ if source == "fred":
 elif source == "yfinance":
     from ingestion.adapters.yfinance import YfinanceAdapter
     adapter = YfinanceAdapter()
+elif source == "treasury":
+    from ingestion.adapters.treasury import TreasuryAdapter
+    adapter = TreasuryAdapter()
+elif source == "alphavantage":
+    from ingestion.adapters.alphaVantage import AlphaVantageAdapter
+    adapter = AlphaVantageAdapter()
 else:
     print(f"Unknown source: {source}")
     sys.exit(1)
@@ -36,11 +37,11 @@ for series_key, data in get_source_series(source).items():
 
     print_errors(error_logs)
 
-    s3_gate = S3_StorageGate()
-    postgres_gate = Postgres_StorageGate()
+    s3_client = S3_Client()
+    postgres_client = Postgres_Client()
 
 
 
-    s3_gate.upload_series(valid_records, source, series_key, date.today(), "validated")
+    s3_client.upload_series(valid_records, source, series_key, "validated")
     # keep state below "raw" cuz validated table is not yet created in postgres
-    postgres_gate.upload_series(valid_records, source, series_key, date.today(), "raw")
+    postgres_client.upload_series(valid_records, source, series_key, "raw")

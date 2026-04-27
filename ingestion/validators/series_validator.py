@@ -1,9 +1,4 @@
 from datetime import datetime
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
 from ingestion.config.series_config import get_series
 
 def validate(records: list[dict], series_key: str) -> tuple[list[dict], list[str]]:
