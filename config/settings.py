@@ -15,6 +15,7 @@ class Settings(BaseSettings):
 
     debug: str
     django_secret_key: str
+    secret_key:str
 
     s3_bucket: str
     aws_access_key: str
