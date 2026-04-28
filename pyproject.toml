@@ -30,6 +30,7 @@ dev = [
     "pytest-django",
     "responses",
     "ruff",
+    "apache-airflow==2.9.0",
 ]
 
 [tool.setuptools.packages.find]
