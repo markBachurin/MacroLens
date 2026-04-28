@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
 
-from ingestion.dag_factory import create_extract_task, create_archive_task, create_validate_task, create_load_task
+from dags.dag_factory import create_extract_task, create_archive_task, create_validate_task, create_load_task
 
 dag_id="ingest_treasury"
 source="treasury"
