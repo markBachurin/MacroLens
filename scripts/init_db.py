@@ -1,5 +1,5 @@
 from ingestion.loaders.db_connection import get_connection
-from settings import settings
+from config.settings import settings
 
 
 def init_db():
