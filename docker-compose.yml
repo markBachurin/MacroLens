@@ -91,6 +91,7 @@ services:
       - ./scripts:/opt/airflow/scripts
       - ./ingestion:/opt/airflow/ingestion
       - ./.env:/opt/airflow/.env
+      - ./config:/opt/airflow/config
     working_dir: /opt/airflow
     command: python scripts/init_db.py
     restart: "no"
