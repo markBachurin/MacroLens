@@ -3,7 +3,7 @@
    All fetch calls go through here. One place to change the base URL.
    ═══════════════════════════════════════════════════════════════ */
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = `${window.location.protocol}//${window.location.hostname}:8000/api`;
 
 /**
  * Core fetch wrapper. Throws on non-ok responses.
