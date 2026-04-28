@@ -13,7 +13,7 @@ dependencies = [
     "boto3",
     "pandas",
     "numpy",
-    "pydantic_settings",
+    "pydantic-settings",
     "scipy",
     "statsmodels",
     "django>=5.0",

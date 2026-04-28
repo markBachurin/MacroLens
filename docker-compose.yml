@@ -1,27 +1,31 @@
 services:
   postgres:
     image: postgres:16-alpine
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: db
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "user", "-d", "db"]
+      test: ["CMD", "pg_isready", "-U", "${PG_USER}", "-d", "${PG_DB}"]
       interval: 5s
       retries: 5
 
   airflow-init:
-    build: temp
+    build: .
     depends_on:
       postgres:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://user:password@postgres:5432/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${PG_USER}:${PG_PASSWORD}@postgres:5432/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     entrypoint: >
       /bin/bash -c "
@@ -29,66 +33,60 @@ services:
       "
 
   airflow-webserver:
-    build: temp
+    build: .
     depends_on:
       postgres:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://user:password@postgres:5432/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${PG_USER}:${PG_PASSWORD}@postgres:5432/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-      AIRFLOW__WEBSERVER__SECRET_KEY: "macrolens-secret-key-123"
       PYTHONDONTWRITEBYTECODE: "1"
       PG_HOST: postgres
-      PG_PORT: 5432
-      PG_DB: db
-      PG_USER: user
-      PG_PASSWORD: password
     volumes:
       - ./dags:/opt/airflow/dags
       - ./ingestion:/opt/airflow/ingestion
       - ./transformation:/opt/airflow/transformation
       - ./.env:/opt/airflow/.env
+      - ./config:/opt/airflow/config
       - ./analytics:/opt/airflow/analytics
     ports:
       - "8080:8080"
     command: webserver
 
   airflow-scheduler:
-    build: temp
+    build: .
     depends_on:
       postgres:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://user:password@postgres:5432/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${PG_USER}:${PG_PASSWORD}@postgres:5432/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-      AIRFLOW__WEBSERVER__SECRET_KEY: "macrolens-secret-key-123"
       PYTHONDONTWRITEBYTECODE: "1"
       PG_HOST: postgres
-      PG_PORT: 5432
-      PG_DB: db
-      PG_USER: user
-      PG_PASSWORD: password
     volumes:
       - ./dags:/opt/airflow/dags
       - ./ingestion:/opt/airflow/ingestion
       - ./transformation:/opt/airflow/transformation
       - ./.env:/opt/airflow/.env
+      - ./config:/opt/airflow/config
       - ./analytics:/opt/airflow/analytics
     command: scheduler
 
   db-init:
-    build: temp
+    build: .
     depends_on:
       postgres:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
       PG_HOST: postgres
-      PG_PORT: 5432
-      PG_DB: db
-      PG_USER: user
-      PG_PASSWORD: password
     volumes:
       - ./scripts:/opt/airflow/scripts
       - ./ingestion:/opt/airflow/ingestion
@@ -99,19 +97,15 @@ services:
 
   api:
     build:
-      context: temp
+      context: .
       dockerfile: Dockerfile.api
     depends_on:
       postgres:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
       PG_HOST: postgres
-      PG_PORT: 5432
-      PG_DB: db
-      PG_USER: user
-      PG_PASSWORD: password
-      DJANGO_SECRET_KEY: "macrolens-secret-key-123"
-      DEBUG: "True"
     volumes:
       - ./api:/opt/api
       - ./dashboard:/opt/api/dashboard
