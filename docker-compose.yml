@@ -107,6 +107,7 @@ services:
       - .env
     environment:
       PG_HOST: postgres
+      PYTHONPATH: /opt/api
     volumes:
       - ./api:/opt/api
       - ./dashboard:/opt/api/dashboard
