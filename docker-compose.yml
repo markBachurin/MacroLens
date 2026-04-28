@@ -114,7 +114,7 @@ services:
       - ./transformation:/opt/transformation
       - ./analytics:/opt/analytics
       - ./.env:/opt/api/.env
-      - ./config:/opt/airflow/config
+      - ./config:/opt/api/config
     ports:
       - "8000:8000"
     working_dir: /opt/api/api
